@@ -5,4 +5,5 @@
 *.suo
 *.user
 *.sln.docstates
-build\pomodoro-visualD\Debug
+build/pomodoro-visualD/Debug/
+*.exe
