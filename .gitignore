@@ -5,8 +5,9 @@
 *.suo
 *.user
 *.sln.docstates
-build/pomodoro-visualD/Debug/
-*.exe
+
+[Dd]ebug/
+[Rr]elease/
 
 # =========================
 # Windows detritus
