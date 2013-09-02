@@ -3,11 +3,13 @@ module pomodoro;
 import gtk.Builder;
 import gtk.Button;
 import gtk.Main;
+import gtk.Label;
 import gtk.Widget;
 import gtk.Window;
 
 import gobject.Type;
 
+import std.datetime;
 import std.stdio;
 import std.c.process;
 
@@ -31,7 +33,7 @@ int main(string[] args)
 	}
 	else
 	{
-		writefln("No glade file specified, using default \"builderTest.glade\"");
+		writeln("No glade file specified, using default:", gladeFile);
 		gladefile = gladeFile;
 	}
 
@@ -51,9 +53,17 @@ int main(string[] args)
 		w.addOnHide( delegate void(Widget aux){ exit(0); } );
 
 		Button b = cast(Button)g.getObject("button1");
-		if(b !is null)
+		if (b !is null)
 		{
 			b.addOnClicked( delegate void(Button aux){ exit(0); } );
+		}
+
+		Label timerLabel = cast(Label)g.getObject("label1");
+
+		if (timerLabel !is null)
+		{
+			auto currentTime = Clock.currTime();
+			timerLabel.setLabel(currentTime.toISOExtString());
 		}
 	}
 	else
