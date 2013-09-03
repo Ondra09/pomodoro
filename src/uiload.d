@@ -2,6 +2,7 @@ module uiload;
 
 import std.c.process;
 import std.concurrency;
+import std.conv;
 import std.datetime;
 import std.stdio;
 
@@ -12,18 +13,29 @@ import core.time;
 import gtk.Builder;
 import gtk.Button;
 import gtk.Label;
+import gtk.Timeout;
 import gtk.Widget;
 import gtk.Window;
-import gtk.Timeout;
+
+immutable Duration workDuration = dur!"minutes"(25);
+immutable Duration shortBreakDuration = dur!"minutes"(1);
+immutable Duration longBreakDuration = dur!"minutes"(15);
 
 struct UIHandlers
 {
-public:
+private:
+
 	Window w;
 	Label timerLabel;
 	Button buttonWork;
 	Button buttonShort;
 	Button buttonLong;
+
+	Duration wholeDuration;
+	SysTime timerStartTick;
+	bool countingDown = false;
+
+public:
 
 	void loadUI(ref Builder g)
 	{
@@ -48,7 +60,7 @@ public:
 			buttonShort = cast(Button)g.getObject("button2");
 			if (buttonShort !is null)
 			{
-				buttonShort.addOnClicked( &shortBrakePressed );
+				buttonShort.addOnClicked( &shortBreakPressed );
 			}else
 			{
 				gladeLoadStatus = false;
@@ -57,7 +69,7 @@ public:
 			buttonLong = cast(Button)g.getObject("button3");
 			if (buttonLong !is null)
 			{
-				buttonLong.addOnClicked( &longBrakePressed );
+				buttonLong.addOnClicked( &longBreakPressed );
 			}else
 			{
 				gladeLoadStatus = false;
@@ -82,39 +94,65 @@ public:
 			throw new Exception("Glade file load failure.");
 		}
 
-		Timeout timeout = new Timeout( 1000, &onSecondElapsed, false );
+		// lets do this 13 time per second to minitage problem with granularity
+		Timeout timeout = new Timeout( 1000/13, &onSecondElapsed, false );
 
 		w.showAll();
 	}
 
+private:
 	bool onSecondElapsed()
 	{
-		auto currentTime = Clock.currTime();
-		timerLabel.setLabel(currentTime.toISOExtString());
+		if (countingDown)
+		{
+			auto currentTime = Clock.currTime();
+			Duration timeToShow = (wholeDuration + (timerStartTick - currentTime));
+
+			long minutes = timeToShow.get!"minutes"();
+			long seconds = timeToShow.get!"seconds"();
+			bool showMinus;
+
+			if (seconds < 0)
+			{
+				seconds *= -1;
+				minutes *= -1;
+
+				showMinus = true;
+			}
+
+			string minutesLabel = to!(string)(minutes);
+			string secondsLabel = (seconds<10?"0":"")~to!(string)(seconds);
+
+			timerLabel.setLabel((showMinus?"-":"")~minutesLabel~":"~secondsLabel);
+
+			if (showMinus)
+			{
+				//timerLabel.
+			}
+		}
 
 		return true;
 	}
 
 	void workPressed(Button aux)
 	{
+		initTimers(workDuration);
 	}
 
-	void shortBrakePressed(Button aux)
+	void shortBreakPressed(Button aux)
 	{
+		initTimers(shortBreakDuration);
 	}
 
-	void longBrakePressed(Button aux)
+	void longBreakPressed(Button aux)
 	{
-	
+		initTimers(longBreakDuration);
 	}
 
+	void initTimers(in ref Duration duration)
+	{
+		wholeDuration = duration;
+		countingDown = true;
+		timerStartTick = Clock.currTime();
+	}
 };
-/*
-void updateUI(shared Duration uiLabel)
-{
-	auto currentTime = Clock.currTime();
-	//uiItems.timerLabel.setLabel((currentTime-currentTimeT).toString());
-	//uiLabel.setLabel(currentTime.toISOExtString());
-
-	Thread.sleep(dur!"msecs"(cast(long)(1000.0/13.0)));
-}*/

@@ -11,6 +11,8 @@ import std.c.process;
 import settings;
 import uiload;
 
+import workdescription;
+
 /**
  * 
  *
@@ -43,6 +45,10 @@ int main(string[] args)
 
 	UIHandlers uiItems;
 	uiItems.loadUI(g);
+
+	// test
+	Message msg;
+	msg.storeToDisk();
 
 	Main.run();
 
