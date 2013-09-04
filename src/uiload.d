@@ -127,7 +127,8 @@ private:
 
 			if (showMinus)
 			{
-				//timerLabel.
+				// show red label
+				// timerLabel.
 			}
 		}
 

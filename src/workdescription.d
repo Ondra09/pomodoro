@@ -1,16 +1,21 @@
 module workdescription;
 
+import std.datetime;
 import std.json;
 import std.stdio;
 
 struct Message
 {
 	string message;
+//	SysTime timeOfAction = Clock.currTime();
+
 	void storeToDisk()
 	{
 		JSONValue rContainer;
 		JSONValue message;
 		JSONValue timestamp;
+
+		timeOfAction.toISOExtString;
 
 		message.type = JSON_TYPE.STRING;
 		message.str = "Pomodoro -- JSON store implementation!";
