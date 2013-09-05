@@ -47,7 +47,7 @@
   <compiler>0</compiler>
   <otherDMD>0</otherDMD>
   <program>$(DMDInstallDir)windows\bin\dmd.exe</program>
-  <imppath>C:\Users\e528738\Documents\GitHub\GtkD-2.2.0\src</imppath>
+  <imppath>C:\Users\e528738\Documents\GitHub\GtkD-1.7.2\src; </imppath>
   <fileImppath />
   <outdir>$(ConfigurationName)</outdir>
   <objdir>$(OutDir)</objdir>
@@ -84,7 +84,7 @@
   <objfiles />
   <linkswitches />
   <libfiles>gtkd.lib</libfiles>
-  <libpaths>C:\Users\e528738\Documents\GitHub\GtkD-2.2.0\</libpaths>
+  <libpaths>C:\Users\e528738\Documents\GitHub\GtkD-1.7.2\</libpaths>
   <deffile />
   <resfile />
   <exefile>$(OutDir)\$(ProjectName).exe</exefile>
@@ -191,5 +191,7 @@
  <Folder name="pomodoro_visualD">
   <File path="..\..\src\pomodoro.d" />
   <File path="..\..\src\settings.d" />
+  <File path="..\..\src\uiload.d" />
+  <File path="..\..\src\workdescription.d" />
  </Folder>
 </DProject>
