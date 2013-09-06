@@ -1,4 +1,4 @@
-pomodoro
+Pomodoro
 ========
 
 Pomodoro cross platform client.
@@ -37,3 +37,16 @@ V4 :
 Ability to run in task bar on following systems: Windows, Ubuntu, Mac OS X
 ~~~~~~~~~~~~
 
+Build dependencies
+------------------
+Build Gtk+ D binding from here: http://gtkd.org
+Download and unpack Gtk 2 package from GtkD.org version 1.7.2 and build it. 
+
+### Windows
+Install gtk.
+
+### Mac OS X
+Install Gtk+ package using homebrew package manager (http://brew.sh)  
+```sh
+brew install gtk+
+```
