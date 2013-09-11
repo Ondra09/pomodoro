@@ -46,7 +46,7 @@ public:
 		if (w !is null)
 		{
 			w.setTitle("This is a glade window");
-			import gtk.Timeout;w.addOnHide( delegate void(Widget aux){ exit(0); } );
+			w.addOnHide( delegate void(Widget aux){ exit(0); } );
 
 			buttonWork = cast(Button)g.getObject("button1");
 			if (buttonWork !is null)
@@ -128,7 +128,7 @@ private:
 			if (showMinus)
 			{
 				// show red label
-				// timerLabel.
+				// ∞∞timerLabel.
 			}
 		}
 

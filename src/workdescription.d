@@ -15,10 +15,10 @@ struct Message
 		JSONValue message;
 		JSONValue timestamp;
 
-		timeOfAction.toISOExtString;
+		//timeOfAction.toISOExtString;
 
 		message.type = JSON_TYPE.STRING;
-		message.str = "Pomodoro -- JSON store implementation!";
+		message.str = "Pomodoro -- JSON storage implementation!";
 
 		timestamp.type = JSON_TYPE.STRING;
 		timestamp.str = "09.05.1023";
