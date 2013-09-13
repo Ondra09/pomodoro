@@ -4,7 +4,10 @@ import std.c.process;
 import std.concurrency;
 import std.conv;
 import std.datetime;
+import std.json;
 import std.stdio;
+import std.path;
+import std.file;
 
 import core.thread;
 import core.time;
@@ -18,10 +21,7 @@ import gtk.Widget;
 import gtk.Window;
 
 import workdescription;
-
-immutable Duration workDuration = dur!"minutes"(25);
-immutable Duration shortBreakDuration = dur!"minutes"(1);
-immutable Duration longBreakDuration = dur!"minutes"(15);
+import settings;
 
 struct UIHandlers
 {
@@ -45,6 +45,8 @@ private:
 	Duration wholeDuration;
 	SysTime timerStartTick;
 	bool countingDown = false;
+
+	AppSettings appSetings;
 
 public:
 
@@ -138,6 +140,8 @@ public:
 			throw new Exception("Glade file load failure.");
 		}
 
+		appSetings = new AppSettings();
+
 		// lets do this 13 time per second to minitage problem with granularity
 		Timeout timeout = new Timeout( 1000/13, &onSecondElapsed, false );
 
@@ -186,12 +190,12 @@ private:
 
 	void shortBreakPressed(Button aux)
 	{
-		initTimers(shortBreakDuration);
+		initTimers(appSetings.shortBreakDuration);
 	}
 
 	void longBreakPressed(Button aux)
 	{
-		initTimers(longBreakDuration);
+		initTimers(appSetings.longBreakDuration);
 	}
 
 	// msg input dialog
@@ -204,7 +208,7 @@ private:
 		msg.messageText = pomodoroDescr;
 		msg.storeToDisk();
 
-		initTimers(workDuration);
+		initTimers(appSetings.workDuration);
 	}
 
 	void msgInputCancelPressed(Button aux)
@@ -217,5 +221,70 @@ private:
 		wholeDuration = duration;
 		countingDown = true;
 		timerStartTick = Clock.currTime();
+	}
+};
+
+class AppSettings
+{
+	immutable Duration workDuration;
+	immutable Duration shortBreakDuration;
+	immutable Duration longBreakDuration;
+
+	this()
+	{
+		if (!exists(expandTilde(msgFileLocation)))
+		{
+			mkdirRecurse(expandTilde(msgFileLocation));
+		}
+
+		string fileName = expandTilde(msgFileLocation)~"/settings.json";
+
+		if (!exists(fileName))
+		{
+			JSONValue rContainer;
+			rContainer.type = JSON_TYPE.OBJECT;
+
+			JSONValue shortBrake, longBrake, work;
+
+			shortBrake.type = JSON_TYPE.INTEGER;
+			longBrake.type = JSON_TYPE.INTEGER;
+			work.type = JSON_TYPE.INTEGER;
+
+			shortBrake.integer = 5;
+			longBrake.integer = 20;
+			work.integer = 25;
+
+			rContainer.object["shortBreak"] = shortBrake;
+			rContainer.object["longBreak"] = longBrake;
+			rContainer.object["work"] = work;
+
+			// create new one with standard settings
+			auto file = File(fileName, "w");
+			file.write(toJSON(&rContainer));
+			file.detach();
+		}
+		
+		// read settings from file
+		auto file = File(fileName, "r");
+		string fileCont;
+		string buf;
+
+		while(file.readln(buf))
+		{
+			fileCont ~= buf;
+		}
+
+		JSONValue rContainer = parseJSON(fileCont);
+
+		JSONValue ssss = rContainer.object["work"];
+		workDuration = dur!"minutes"(ssss.integer);
+
+		ssss = rContainer.object["shortBreak"];
+		shortBreakDuration = dur!"minutes"(ssss.integer);
+
+		ssss = rContainer.object["longBreak"];
+		longBreakDuration = dur!"minutes"(ssss.integer);
+
+		file.detach();
 	}
 };
