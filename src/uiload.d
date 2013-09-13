@@ -7,15 +7,17 @@ import std.datetime;
 import std.stdio;
 
 import core.thread;
-
 import core.time;
 
 import gtk.Builder;
 import gtk.Button;
+import gtk.Entry;
 import gtk.Label;
 import gtk.Timeout;
 import gtk.Widget;
 import gtk.Window;
+
+import workdescription;
 
 immutable Duration workDuration = dur!"minutes"(25);
 immutable Duration shortBreakDuration = dur!"minutes"(1);
@@ -25,11 +27,20 @@ struct UIHandlers
 {
 private:
 
+	// TODO : create separat class for every dialog -- only if there will be more of them
+	// main window
 	Window w;
+	
 	Label timerLabel;
 	Button buttonWork;
 	Button buttonShort;
 	Button buttonLong;
+
+	// msg dialog
+	Window msgWindow;
+	Button okButton;
+	Button cancelButton;
+	Entry msgEntry;
 
 	Duration wholeDuration;
 	SysTime timerStartTick;
@@ -40,6 +51,11 @@ public:
 	void loadUI(ref Builder g)
 	{
 		w = cast(Window)g.getObject("Pomodoro");
+
+		msgWindow = cast(Window)g.getObject("msginputwindow");
+
+		msgWindow.setTransientFor(w);
+		msgWindow.setModal(true);
 
 		bool gladeLoadStatus = true;
 
@@ -70,6 +86,34 @@ public:
 			if (buttonLong !is null)
 			{
 				buttonLong.addOnClicked( &longBreakPressed );
+			}else
+			{
+				gladeLoadStatus = false;
+			}
+
+			// msg input buttons
+			okButton = cast(Button)g.getObject("okbutton");
+			if (okButton !is null)
+			{
+				okButton.addOnClicked( &msgInputOkPressed );
+			}else
+			{
+				gladeLoadStatus = false;
+			}
+
+			cancelButton = cast(Button)g.getObject("cancelbutton");
+			if (cancelButton !is null)
+			{
+				cancelButton.addOnClicked( &msgInputCancelPressed );
+			}else
+			{
+				gladeLoadStatus = false;
+			}
+
+			msgEntry = cast(Entry)g.getObject("msgEntry");
+			if (cancelButton !is null)
+			{
+				//cancelButton.addOnClicked( &msgInputCancelPressed );
 			}else
 			{
 				gladeLoadStatus = false;
@@ -137,7 +181,7 @@ private:
 
 	void workPressed(Button aux)
 	{
-		initTimers(workDuration);
+		msgWindow.showAll();
 	}
 
 	void shortBreakPressed(Button aux)
@@ -148,6 +192,24 @@ private:
 	void longBreakPressed(Button aux)
 	{
 		initTimers(longBreakDuration);
+	}
+
+	// msg input dialog
+	void msgInputOkPressed(Button aux)
+	{
+		msgWindow.hide();
+		string pomodoroDescr = msgEntry.getText();
+		// test
+		workdescription.Message msg;
+		msg.messageText = pomodoroDescr;
+		msg.storeToDisk();
+
+		initTimers(workDuration);
+	}
+
+	void msgInputCancelPressed(Button aux)
+	{
+		msgWindow.hide();
 	}
 
 	void initTimers(in ref Duration duration)

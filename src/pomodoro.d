@@ -11,8 +11,6 @@ import std.c.process;
 import settings;
 import uiload;
 
-import workdescription;
-
 /**
  * 
  *
@@ -39,16 +37,18 @@ int main(string[] args)
 
 	if( ! g.addFromFile(gladefile) )
 	{
-		throw new Exception("Could notBUILD_DIRlade object from file.");
+		throw new Exception("Could not load glade object from file.");
+		exit(1);
+	}
+
+	if( ! g.addFromFile(msgInputDialog) )
+	{
+		throw new Exception("Could not load glade object from file.");
 		exit(1);
 	}
 
 	UIHandlers uiItems;
 	uiItems.loadUI(g);
-
-	// test
-	Message msg;
-	msg.storeToDisk();
 
 	Main.run();
 
