@@ -24,7 +24,7 @@ Basic pomodoro timers: work, short & long brake.
 ~~~~~~~~~~~~
 V2 :
 ~~~~~~~~~~~~
-Text description of pomodoro. JSON & CVS export. Settings in text file.
+Text description of pomodoro. CVS export. Settings in text file.
 All functionality done.
 ~~~~~~~~~~~~
 V3 :
